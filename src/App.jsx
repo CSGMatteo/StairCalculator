@@ -130,7 +130,7 @@ export default function App() {
       
       {step === "start" && (
         <Card className="shadow-xl rounded-2xl">
-          <CardContent className="p-10 text-center space-y-6">
+          <CardContent className="p-30 text-center space-y-6">
             <h1 className="text-3xl font-bold">
               Stair Carpet Calculator
             </h1>
@@ -226,10 +226,10 @@ export default function App() {
             </h2>
 
             {[
-              ["box", "Box Steps (3 x 1.75)"],
-              ["open1", "Open 1 Side (4 x 1.75)"],
-              ["open2", "Double Open (6 x 1.75)"],
-              ["pie", "Pie (4 x 3)"],
+              ["box", "Box Steps"],
+              ["open1", "Open 1 Side"],
+              ["open2", "Double Open"],
+              ["pie", "Pie"],
             ].map(([key, label]) => (
               <div key={key} className="space-y-2">
                 <label className="font-medium">{label}</label>
