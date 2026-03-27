@@ -136,7 +136,7 @@ export default function App() {
             </h1>
 
             <Button
-              className="w-full text-2xl py-6"
+              className="w-full text-2xl py-10"
               onClick={() => setStep("landing")}
             >
               Start Stair Calculation
