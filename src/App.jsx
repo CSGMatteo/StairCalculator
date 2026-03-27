@@ -123,80 +123,158 @@ export default function App() {
 
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
+  <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="w-full max-w-2xl">
+      
       {step === "start" && (
-          <div className="p-6 text-center">
-            <h1 className="text-2xl font-bold mb-4">Stair Carpet Calculator</h1>
-            <button onClick={() => setStep("landing")}>Start Stair Calculation</button>
-          </div>
+        <Card className="shadow-xl rounded-2xl">
+          <CardContent className="p-10 text-center space-y-6">
+            <h1 className="text-3xl font-bold">
+              Stair Carpet Calculator
+            </h1>
+
+            <Button
+              className="w-full text-lg py-6"
+              onClick={() => setStep("landing")}
+            >
+              Start Stair Calculation
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {step === "landing" && (
-          <div className="p-6 space-y-4">
-            <h2 className="text-xl font-semibold">Is there a landing?</h2>
-            <div className="flex gap-2">
-              <button onClick={() => { setLanding(true); setStep("landingSize"); }}>Yes</button>
-              <button onClick={() => { setLanding(false); setStep("stairs"); }}>No</button>
+        <Card className="shadow-xl rounded-2xl">
+          <CardContent className="p-8 text-center space-y-6">
+            <h2 className="text-2xl font-semibold">
+              Is there a landing?
+            </h2>
+
+            <div className="flex gap-4">
+              <Button
+                className="flex-1 py-6 text-lg"
+                onClick={() => {
+                  setLanding(true);
+                  setStep("landingSize");
+                }}
+              >
+                Yes
+              </Button>
+
+              <Button
+                className="flex-1 py-6 text-lg"
+                onClick={() => {
+                  setLanding(false);
+                  setStep("stairs");
+                }}
+              >
+                No
+              </Button>
             </div>
-          </div>
+          </CardContent>
+        </Card>
       )}
 
       {step === "landingSize" && (
-          <div className="p-6 space-y-4">
-            <h2 className="text-xl">Enter Landing Size (ft)</h2>
+        <Card className="shadow-xl rounded-2xl">
+          <CardContent className="p-8 space-y-6">
+            <h2 className="text-2xl font-semibold text-center">
+              Enter Landing Size (ft)
+            </h2>
+
             <input
               type="number"
               placeholder="Width"
-              className="border p-2 w-full"
-              onChange={(e) => setLandingSize({ ...landingSize, w: parseFloat(e.target.value) })}
+              className="border p-4 w-full text-lg rounded-lg"
+              onChange={(e) =>
+                setLandingSize({
+                  ...landingSize,
+                  w: parseFloat(e.target.value),
+                })
+              }
             />
+
             <input
               type="number"
               placeholder="Length"
-              className="border p-2 w-full"
-              onChange={(e) => setLandingSize({ ...landingSize, h: parseFloat(e.target.value) })}
+              className="border p-4 w-full text-lg rounded-lg"
+              onChange={(e) =>
+                setLandingSize({
+                  ...landingSize,
+                  h: parseFloat(e.target.value),
+                })
+              }
             />
-            <button onClick={() => setStep("stairs")}>Next</button>
-          </div>
+
+            <Button
+              className="w-full text-lg py-6"
+              onClick={() => setStep("stairs")}
+            >
+              Next
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {step === "stairs" && (
-          <div className="p-6 space-y-4">
-            <h2 className="text-xl font-semibold">Enter Stair Counts</h2>
+        <Card className="shadow-xl rounded-2xl">
+          <CardContent className="p-8 space-y-6">
+            <h2 className="text-2xl font-semibold text-center">
+              Enter Stair Counts
+            </h2>
 
             {[
-              ["box", "Box Steps"],
-              ["open1", "Open 1 Side"],
-              ["open2", "Double Open"],
-              ["pie", "Pie"]
+              ["box", "Box Steps (3 x 1.75)"],
+              ["open1", "Open 1 Side (4 x 1.75)"],
+              ["open2", "Double Open (6 x 1.75)"],
+              ["pie", "Pie (4 x 3)"],
             ].map(([key, label]) => (
-              <div key={key}>
-                <label>{label}</label>
+              <div key={key} className="space-y-2">
+                <label className="font-medium">{label}</label>
                 <input
                   type="number"
-                  className="border p-2 w-full"
+                  className="border p-4 w-full text-lg rounded-lg"
                   onChange={(e) =>
                     setCounts({
                       ...counts,
-                      [key]: parseInt(e.target.value) || 0
+                      [key]: parseInt(e.target.value) || 0,
                     })
                   }
                 />
               </div>
             ))}
 
-            <button onClick={runCalculation}>Calculate</button>
-          </div>
+            <Button
+              className="w-full text-lg py-6"
+              onClick={runCalculation}
+            >
+              Calculate
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {step === "result" && (
-          <div className="p-6 text-center space-y-4">
-            <h2 className="text-xl font-semibold">Result</h2>
-            <p className="text-lg">Total Carpet Length Required:</p>
-            <p className="text-2xl font-bold">{result} ft</p>
-            <button onClick={() => setStep("start")}>Start Over</button>
-          </div>
+        <Card className="shadow-xl rounded-2xl">
+          <CardContent className="p-10 text-center space-y-6">
+            <h2 className="text-2xl font-semibold">Result</h2>
+
+            <p className="text-lg">
+              Total Carpet Length Required:
+            </p>
+
+            <p className="text-4xl font-bold">{result} ft</p>
+
+            <Button
+              className="w-full text-lg py-6"
+              onClick={() => setStep("start")}
+            >
+              Start Over
+            </Button>
+          </CardContent>
+        </Card>
       )}
+
     </div>
-  );
-}
+  </div>
+);
