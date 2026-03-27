@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Card, CardContent } from "./components/ui/card";
-import { Button } from "./components/ui/button";
+import { Card, CardContent } from "./components/ui/card.jsx/index.js";
+import { Button } from "./components/ui/button.jsx";
 
 // Piece definitions (feet)
 const PIECE_TYPES = {
