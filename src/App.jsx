@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "./components/ui/card.jsx";
 import { Button } from "./components/ui/button.jsx";
+import './index.css'
 
 // Piece definitions (feet)
 const PIECE_TYPES = {
@@ -135,9 +136,12 @@ export default function App() {
               Stair Carpet Calculator
             </h1>
 
-            <button className="bg-red-500 text-white text-2xl py-10 w-full">
-              TEST BUTTON
-            </button>
+            <Button
+              className="w-full text-2xl py-10"
+              onClick={() => setStep("landing")}
+            >
+              Start Stair Calculation
+            </Button>
           </CardContent>
         </Card>
       )}
