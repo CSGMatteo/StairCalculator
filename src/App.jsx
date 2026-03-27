@@ -129,14 +129,14 @@ export default function App() {
     <div className="w-full max-w-2xl">
       
       {step === "start" && (
-        <Card className="shadow-3xl rounded-4xl">
-          <CardContent className="text-2xl text-center space-y-6">
-            <h1 className="text-5xl font-bold">
+        <Card className="shadow-xl rounded-2xl">
+          <CardContent className="p-10 text-center space-y-6">
+            <h1 className="text-3xl font-bold">
               Stair Carpet Calculator
             </h1>
 
             <Button
-              className="w-full text-lg py-6"
+              className="w-full text-2xl py-6"
               onClick={() => setStep("landing")}
             >
               Start Stair Calculation
