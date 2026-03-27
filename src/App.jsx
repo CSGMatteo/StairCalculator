@@ -13,19 +13,6 @@ const PIECE_TYPES = {
 
 const ROLL_WIDTH = 12;
 
-function resetApp() {
-  setStep("start");
-  setLanding(false);
-  setLandingSize({ w: 0, h: 0 });
-  setCounts({
-    box: 0,
-    open1: 0,
-    open2: 0,
-    pie: 0
-  });
-  setResult(null);
-}
-
 // Simple packing heuristic (grid-based scanning)
 function calculateLength(pieces) {
   const GRID = 0.25;
@@ -136,6 +123,19 @@ export default function App() {
       setResult(best.toFixed(2));
       setStep("result");
   }
+
+  function resetApp() {
+  setStep("start");
+  setLanding(false);
+  setLandingSize({ w: 0, h: 0 });
+  setCounts({
+    box: 0,
+    open1: 0,
+    open2: 0,
+    pie: 0
+  });
+  setResult(null);
+}
 
 
   return (
