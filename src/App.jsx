@@ -129,7 +129,7 @@ export default function App() {
     <div className="w-full max-w-2xl">
       
       {step === "start" && (
-        <Card className="shadow-xl rounded-2xl">
+        <Card className="shadow-3xl rounded-4xl">
           <CardContent className="text-2xl text-center space-y-6">
             <h1 className="text-5xl font-bold">
               Stair Carpet Calculator
