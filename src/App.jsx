@@ -270,7 +270,14 @@ export default function App() {
 
             <Button
               className="w-full text-lg py-6"
-              onClick={() => setStep("start")}
+              onClick={() => {
+                setStep("start");
+              setInputs({
+                boxes: "",
+                opensides: ""
+              });
+            setResult(null);
+              }}
             >
               Start Over
             </Button>
