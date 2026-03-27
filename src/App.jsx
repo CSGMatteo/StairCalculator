@@ -168,7 +168,7 @@ export default function App() {
               ["box", "Box Steps"],
               ["open1", "Open 1 Side"],
               ["open2", "Double Open"],
-              ["pie", "Pie (4 x 3)"]
+              ["pie", "Pie"]
             ].map(([key, label]) => (
               <div key={key}>
                 <label>{label}</label>
