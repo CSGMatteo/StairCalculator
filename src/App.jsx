@@ -135,12 +135,9 @@ export default function App() {
               Stair Carpet Calculator
             </h1>
 
-            <Button
-              className="w-full text-2xl py-10"
-              onClick={() => setStep("landing")}
-            >
-              Start Stair Calculation
-            </Button>
+            <button className="bg-red-500 text-white text-2xl py-10 w-full">
+              TEST BUTTON
+            </button>
           </CardContent>
         </Card>
       )}
