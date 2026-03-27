@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardContent } from "./components/ui/card.jsx/index.js";
+import { Card, CardContent } from "./components/ui/card.jsx";
 import { Button } from "./components/ui/button.jsx";
 
 // Piece definitions (feet)
