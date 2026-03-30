@@ -139,24 +139,22 @@ export default function App() {
 
 
   return (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-    <div className="w-full max-w-2xl">
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-700 p-6">
+    <div className="w-full max-w-3xl">
       
       {step === "start" && (
-        <Card className="shadow-xl rounded-2xl">
-          <CardContent className="p-10 text-center space-y-6">
-            <h1 className="text-3xl font-bold">
-              Stair Carpet Calculator
-            </h1>
+        <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+          <h1 className="text-3xl font-bold text-center">
+            Stair Carpet Calculator
+          </h1>
 
-            <Button
-              className="w-full text-2xl py-10"
-              onClick={() => setStep("landing")}
-            >
-              Start Stair Calculation
-            </Button>
-          </CardContent>
-        </Card>
+          <button
+            className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+            onClick={() => setStep("landing")}
+          >
+            Start Stair Calculation
+          </button>
+        </div>
       )}
 
       {step === "landing" && (
@@ -249,7 +247,7 @@ export default function App() {
                 <label className="font-medium">{label}</label>
                 <input
                   type="number"
-                  className="border p-4 w-full text-lg rounded-lg"
+                  className="w-full p-4 test-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-blue-500"
                   onChange={(e) =>
                     setCounts({
                       ...counts,
@@ -279,7 +277,7 @@ export default function App() {
               Total Carpet Length Required:
             </p>
 
-            <p className="text-4xl font-bold">{result} ft</p>
+            <p className="text-5xl font-bold text-blue-600">{result} ft</p>
 
             <Button
               className="w-full text-lg py-6"
