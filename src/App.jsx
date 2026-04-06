@@ -5,13 +5,18 @@ import './index.css'
 
 // Piece definitions (feet)
 const PIECE_TYPES = {
-  box: { w: 3, h: 1.75 },
-  open1: { w: 4, h: 1.75 },
-  open2: { w: 6, h: 1.75 },
-  pie: { w: 4, h: 3 }
+  box: { w: 3, h: 1.75, installCost: 12 },
+  open1: { w: 4, h: 1.75, installCost: 18 },
+  open2: { w: 6, h: 1.75, installCost: 30 },
+  pie: { w: 4, h: 3, installCost: 18 }
 };
 
+
 const ROLL_WIDTH = 12;
+
+const minInstallCost = 300;
+
+const minRemovalCost = 125;
 
 // Simple packing heuristic (grid-based scanning)
 function calculateLength(pieces) {
@@ -72,6 +77,13 @@ export default function App() {
   const [step, setStep] = useState("start");
   const [landing, setLanding] = useState(false);
   const [landingSize, setLandingSize] = useState({ w: 0, h: 0 });
+  const [cost, setCost] = useState(null)
+  const [removal, setRemoval] = useState(false);
+  const [install, setInstall] = useState(false);
+  const [carpetTotal, setCarpetTotal] = useState(null)
+  const [installTotal, setInstallTotal] = useState(null)
+  const [grandTotal, setGrandTotal] = useState(null)
+  
 
   const [counts, setCounts] = useState({
     box: 0,
@@ -124,6 +136,35 @@ export default function App() {
       setStep("result");
   }
 
+  function CostCalculation() {
+    let carpetTotal = (parseFloat(result || 0) * ROLL_WIDTH) * parseFloat(cost || 0);
+    let installTotal = 0;
+
+   if (install) {
+     for (let key in counts) {
+       const count = counts[key];
+       const costPerStep = PIECE_TYPES[key].installCost;
+
+        installTotal += count * costPerStep;
+     }
+
+     installTotal += minInstallCost;
+
+     if (removal) {
+       installTotal += minRemovalCost;
+     }
+    }
+
+    const grandTotal = parseFloat(
+      ((carpetTotal + installTotal) * 1.13).toFixed(2));
+
+    // save everything
+    setCarpetTotal(carpetTotal);
+    setInstallTotal(installTotal);
+    setGrandTotal(grandTotal);
+    setStep("resultinstallcost");
+  }
+
   function resetApp() {
   setStep("start");
   setLanding(false);
@@ -135,6 +176,12 @@ export default function App() {
     pie: 0
   });
   setResult(null);
+  setCost(null);
+  setRemoval(false);
+  setInstall(false);
+  setCarpetTotal(null);
+  setInstallTotal(null);
+  setGrandTotal(null);
 }
 
 
@@ -158,135 +205,238 @@ export default function App() {
       )}
 
       {step === "landing" && (
-        <Card className="shadow-xl rounded-2xl">
-          <CardContent className="p-8 text-center space-y-6">
-            <h2 className="text-2xl font-semibold">
-              Is there a landing?
-            </h2>
+        <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+         <h2 className="text-3xl font-bold text-center">
+          Is there a landing?
+        </h2>
 
-            <div className="flex gap-4">
-              <Button
-                className="flex-1 py-6 text-lg"
-                onClick={() => {
-                  setLanding(true);
-                  setStep("landingSize");
-                }}
-              >
-                Yes
-              </Button>
+        <div className="flex gap-4">
+           <button
+            className="flex-1 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+             onClick={() => {
+              setLanding(true);
+              setStep("landingSize");
+              }}
+             >
+             Yes
+           </button>
 
-              <Button
-                className="flex-1 py-6 text-lg"
-                onClick={() => {
-                  setLanding(false);
-                  setStep("stairs");
-                }}
+           <button
+             className="flex-1 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+              onClick={() => {
+               setLanding(false);
+               setStep("stairs");
+              }}
               >
-                No
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              No
+            </button>
+        </div>
+        </div>
       )}
 
       {step === "landingSize" && (
-        <Card className="shadow-xl rounded-2xl">
-          <CardContent className="p-8 space-y-6">
-            <h2 className="text-2xl font-semibold text-center">
-              Enter Landing Size (ft)
-            </h2>
+        <div className="bg-white rounded-2xl shadow-xl p-8 text-center space-y-6">
+          <h2 className="text-2xl font-semibold text-center">
+            Enter Landing Size (ft)
+          </h2>
 
-            <input
-              type="number"
-              placeholder="Width"
-              className="border p-4 w-full text-lg rounded-lg"
-              onChange={(e) =>
-                setLandingSize({
-                  ...landingSize,
-                  w: parseFloat(e.target.value),
-                })
-              }
-            />
+          <input
+            type="number"
+            placeholder="Width"
+            className="border p-4 w-full text-lg rounded-lg"
+            onChange={(e) =>
+              setLandingSize({
+                ...landingSize,
+                w: parseFloat(e.target.value),
+              })
+            }
+          />
 
-            <input
-              type="number"
-              placeholder="Length"
-              className="border p-4 w-full text-lg rounded-lg"
-              onChange={(e) =>
-                setLandingSize({
-                  ...landingSize,
-                  h: parseFloat(e.target.value),
-                })
-              }
-            />
+          <input
+            type="number"
+            placeholder="Length"
+            className="border p-4 w-full text-lg rounded-lg"
+            onChange={(e) =>
+              setLandingSize({
+                ...landingSize,
+                h: parseFloat(e.target.value),
+              })
+            }
+          />
 
-            <Button
-              className="w-full text-lg py-6"
-              onClick={() => setStep("stairs")}
-            >
-              Next
-            </Button>
-          </CardContent>
-        </Card>
+          <button
+            className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+            onClick={() => setStep("stairs")}
+          >
+            Next
+          </button>
+        </div>
       )}
 
       {step === "stairs" && (
-        <Card className="shadow-xl rounded-2xl">
-          <CardContent className="p-8 space-y-6">
-            <h2 className="text-2xl font-semibold text-center">
-              Enter Stair Counts
-            </h2>
+        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+          <h2 className="text-2xl font-semibold text-center">
+            Enter Stair Counts
+          </h2>
 
-            {[
-              ["box", "Box Steps"],
-              ["open1", "Open 1 Side"],
-              ["open2", "Double Open"],
-              ["pie", "Pie"],
-            ].map(([key, label]) => (
-              <div key={key} className="space-y-2">
-                <label className="font-medium">{label}</label>
-                <input
-                  type="number"
-                  className="w-full p-4 test-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-blue-500"
-                  onChange={(e) =>
-                    setCounts({
-                      ...counts,
-                      [key]: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-            ))}
+          {[
+            ["box", "Box Steps"],
+            ["open1", "Open 1 Side"],
+            ["open2", "Double Open"],
+            ["pie", "Pie"],
+          ].map(([key, label]) => (
+            <div key={key} className="space-y-2">
+              <label className="font-medium">{label}</label>
+              <input
+                type="number"
+                className="w-full p-4 test-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-blue-500"
+                onChange={(e) =>
+                  setCounts({
+                    ...counts,
+                    [key]: parseInt(e.target.value) || 0,
+                  })
+                }
+              />
+            </div>
+          ))}
 
-            <Button
-              className="w-full text-lg py-6"
-              onClick={runCalculation}
-            >
-              Calculate
-            </Button>
-          </CardContent>
-        </Card>
+          <button
+            className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+            onClick={runCalculation}
+          >
+            Calculate
+          </button>
+        </div>
       )}
 
       {step === "result" && (
-        <Card className="shadow-xl rounded-2xl">
-          <CardContent className="p-10 text-center space-y-6">
-            <h2 className="text-2xl font-semibold">Result</h2>
+        <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+          <h2 className="text-2xl font-semibold">Result</h2>
 
-            <p className="text-lg">
-              Total Carpet Length Required:
-            </p>
+          <p className="text-lg">
+            Total Carpet Length Required:
+          </p>
 
-            <p className="text-5xl font-bold text-blue-600">{result} ft</p>
+          <p className="text-5xl font-bold text-blue-600">{result} ft</p>
 
-            <Button
-              className="w-full text-lg py-6"
-              onClick={resetApp}
-            >
-              Start Over
-            </Button>
-          </CardContent>
-        </Card>
+          <button
+            className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+            onClick={resetApp}
+          >
+            Start Over
+          </button>
+          <button
+            className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+            onClick={() => setStep("IsInstall")}
+          >
+            Calculate Cost
+          </button>
+        </div>
+      )}
+
+      {step == "IsInstall" && (
+        <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+         <h2 className="text-3xl font-bold text-center">
+          Are We Installing It
+        </h2>
+
+        <div className="flex gap-4">
+           <button
+            className="flex-1 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+             onClick={() => {
+              setInstall(true);
+              setStep("Removal");
+              }}
+             >
+             Yes
+           </button>
+
+           <button
+             className="flex-1 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+              onClick={() => {
+               setInstall(false);
+               setStep("Cost");
+              }}
+              >
+              No
+            </button>
+        </div>
+        </div>
+      )} 
+
+      {step == "Removal" && (
+        <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+         <h2 className="text-3xl font-bold text-center">
+          Is There Removal?
+        </h2>
+
+        <div className="flex gap-4">
+           <button
+            className="flex-1 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+             onClick={() => {
+              setRemoval(true);
+              setStep("Cost");
+              }}
+             >
+             Yes
+           </button>
+
+           <button
+             className="flex-1 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+              onClick={() => {
+               setRemoval(false);
+               setStep("Cost");
+              }}
+              >
+              No
+            </button>
+        </div>
+        </div>
+      )} 
+
+      {step == "Cost" && (
+        <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+          <h1 className="text-3xl font-bold text-center">
+            What Is The Cost Of The Carpet? ($/sqft)
+          </h1>
+
+          <input
+            type="number"
+            placeholder="Cost ($/sqft)"
+            className="border p-4 w-full text-lg rounded-lg"
+            onChange={(e) =>
+              setCost(parseFloat(e.target.value) || 0)
+            }
+          />
+
+          <button
+            className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+            onClick={CostCalculation}
+          >
+            Calculate
+          </button>
+        </div>
+      )}
+
+      {step === "resultinstallcost" && (
+        <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+          <h2 className="test-2xl font-semibold">Approximate Cost</h2>
+
+          <p className="text-lg">
+            {install
+              ? "Approximate Cost Of Carpet + Install (Including Tax)"
+              : "Approximate Cost of Carpet"}
+          </p>
+
+          <p className="text-5xl font-bold text-blue-600">${grandTotal}</p>
+
+          <button
+            className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+            onClick={resetApp}
+          >
+            Start Over
+          </button>
+        </div>
       )}
 
     </div>
