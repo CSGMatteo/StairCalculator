@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Card, CardContent } from "./components/ui/card.jsx";
 import { Button } from "./components/ui/button.jsx";
 import './index.css'
+import { parse } from "postcss";
+
 
 // Piece definitions (feet)
 const PIECE_TYPES = {
@@ -27,6 +29,7 @@ const minInstallCost = 300;
 const minRemovalCost = 125;
 
 const padcost = 0.85
+
 // Simple packing heuristic (grid-based scanning)
 function calculateLength(pieces, landingHeight = 0) {
   const GRID = 0.25;
@@ -116,6 +119,37 @@ export default function App() {
   const [patRepeat, setPatRepeat] = useState(false)
   const [bindingTotal, setBindingTotal] = useState(0)
 
+  const [vinylClickInstall, setVinylClickInstall] = useState(false)
+  const [vinylGlueInstall, setVinylGlueInstall] = useState(false)
+  const [vinylSheetInstall, setVinylSheetInstall] = useState(false)
+  const [laminateInstall, setLaminateInstall] = useState(false)
+  const [hardwoodInstall, setHardwoodInstall] = useState(false)
+  const [carpetInstall, setCarpetInstall] = useState(false)
+  const [tileInstall, setTileInstall] = useState(false)
+
+  const [rooms, setRooms] = useState([]);
+  const [roomInput, setRoomInput] = useState({ width: "", length: "" });
+  const [roomCost, setRoomCost] = useState(null)
+  const [roomTotal, setRoomTotal] = useState(null)
+
+  const formatMoney = (value) =>
+    value?.toLocaleString("en-CA", {
+      style: "currency",
+      currency: "CAD"
+    });
+
+  
+  const backgrounds = {
+    menu: "bg-gradient-to-br from-blue-500 to-indigo-700",
+    stairs: "bg-gradient-to-br from-cyan-500 to-indigo-700",
+    maintenance: "bg-gradient-to-br from-amber-400 to-orange-600",
+    rooms: "bg-gradient-to-br from-cyan-500 to-indigo-700"
+  };
+
+  const backgroundClass = backgrounds[mode] || "bg-gray-100";
+
+  
+
   const [counts, setCounts] = useState({
     box: 0,
     open1: 0,
@@ -125,7 +159,7 @@ export default function App() {
   });
 
   const [result, setResult] = useState(null);
-
+// #region Stairs Logic
   function calcrunnerwidth() {
     let rwidth = 0
 
@@ -141,8 +175,6 @@ export default function App() {
     setRWidth(rwidth)
     setStep("landing")
   }
-
-
   function buildPieces() {
     const pieces = [];
 
@@ -178,7 +210,6 @@ export default function App() {
     }
     return pieces;
   }
-
   function runCalculation() {
     const pieces = buildPieces();
 
@@ -205,7 +236,6 @@ export default function App() {
       setResult(best.toFixed(2));
       setStep("result");
   }
-
   function getRunnerLength() {
     return (
       (counts.box || 0) * 1.75 +
@@ -215,7 +245,6 @@ export default function App() {
       (counts.curved || 0) * 2.5
     );
   }
-
   function getLandingPerimeter() {
     if (landing) {
       const w = parseFloat(landingSize.w) || 0;
@@ -225,7 +254,6 @@ export default function App() {
       return (0);
     }
   }
-
   function BindingCalc() {
     const BindingCost = 1.5
     
@@ -233,13 +261,11 @@ export default function App() {
       (getLandingPerimeter() + (getRunnerLength() * 2)) * BindingCost
     );
   }
-
   function getInstallCost(key) {
     return runner
       ? INSTALL_COSTS[key].runner
       : INSTALL_COSTS[key].normal;
   }
-
   function CostCalculation() {
     let carpetTotal = (parseFloat(result || 0) * ROLL_WIDTH) * parseFloat(cost || 0);
     let installTotal = 0;
@@ -278,6 +304,25 @@ export default function App() {
     console.log("RunnerLegth:", getRunnerLength())
     console.log("Landing Perimeter:", getLandingPerimeter())
   }
+// #endregion
+
+  function addRoom(room) {
+    setRooms(prev => [...prev, room]);
+  }
+
+  function getTotalArea() {
+    return rooms.reduce((total, room) => {
+      return total + (room.width * room.length);
+    }, 0);
+  }
+
+  function calculateRoomTotal() {
+    const totalArea = getTotalArea();
+    const total = totalArea * roomCost;
+
+    setRoomTotal(total);
+    setStep("roomResult")
+  }
 
   function resetApp() {
   setmode("menu")
@@ -298,15 +343,27 @@ export default function App() {
   setCarpetTotal(null);
   setInstallTotal(null);
   setGrandTotal(null);
-  setwallWall(false)
-  setRunner(false)
-  setRunnerLanding(null)
-  setRWidth(null)
-  setPatRepeatSize(null)
+  setwallWall(false);
+  setRunner(false);
+  setRunnerLanding(null);
+  setRWidth(null);
+  setPatRepeatSize(null);
+
+  setVinylClickInstall(false);
+  setVinylGlueInstall(false);
+  setVinylSheetInstall(false);
+  setLaminateInstall(false);
+  setHardwoodInstall(false);
+  setCarpetInstall(false);
+  setTileInstall(false);
+  setRooms([]);
+  setRoomInput({ width: 0, length: 0 });
+  setRoomCost(null);
+  setRoomTotal(null);
 }
 
   return (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-700 p-6">
+  <div className={`min-h-screen flex items-center justify-center ${backgroundClass} p-6`}>
     <div className="w-full max-w-3xl">
 
       {mode === "menu" && (
@@ -324,10 +381,37 @@ export default function App() {
           >
            Stairs
           </button>
+
+          <button
+            className="w-full text-xl py-6 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition"
+            onClick={() => {
+              setmode("rooms")
+              setStep("decideFloorRooms");
+            }}
+          >
+            Room Calculator
+          </button>
+
+          <button
+            className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+            onClick={() => {
+              setmode("maintenance")
+              setStep("Maintenance")
+            }}
+          >
+            Other
+          </button>
         </div>
       )}
       {mode === "stairs" && (
         <>
+        <button
+          onClick={resetApp}
+          className="fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-600 font-semibold transition"
+        >
+          Main Menu
+        </button>
+
         {step === "StairCalc" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             <h1 className="text-3xl font-bold text-center">
@@ -353,16 +437,15 @@ export default function App() {
             </button>
          </div>
         )}
-
         {step == "RunnerWidth" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             <h1 className="text-3xl font-bold text-center">
-              What is the desired width of the runner?
+              What is the desired width of the runner (In)?
             </h1>
 
             <input
               type="number"
-              placeholder="Runner Width"
+              placeholder="Runner Width (In)"
               className="border p-4 w-full text-lg rounded-lg"
               onChange={(e) =>
                 setRWidth(parseFloat(e.target.value) || 0)
@@ -377,7 +460,6 @@ export default function App() {
             </button>
           </div>
         )}
-
         {step == "Pattern" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             <h1 className="text-3xl font-bold text-center">
@@ -414,7 +496,6 @@ export default function App() {
             </div>
           </div>
         )}
-
         {step === "landing" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
           <h2 className="text-3xl font-bold text-center">
@@ -448,7 +529,6 @@ export default function App() {
           </div>
           </div>
         )}
-
         {step === "landingRunner" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             <h1 className="text-3xl font-bold text-center">
@@ -476,7 +556,6 @@ export default function App() {
             </button>
           </div>
         )}
-
         {step === "landingWall" && (
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center space-y-6">
             <h2 className="text-2xl font-semibold text-center">
@@ -515,7 +594,6 @@ export default function App() {
             </button>
           </div>
         )}
-
         {step === "stairs" && (
           <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
             <h2 className="text-2xl font-semibold text-center">
@@ -552,7 +630,6 @@ export default function App() {
             </button>
           </div>
         )}
-
         {step === "result" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             <h2 className="text-2xl font-semibold">Result</h2>
@@ -577,7 +654,6 @@ export default function App() {
             </button>
           </div>
         )}
-
         {step == "IsInstall" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
           <h2 className="text-3xl font-bold text-center">
@@ -607,7 +683,6 @@ export default function App() {
           </div>
           </div>
         )} 
-
         {step == "Removal" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
           <h2 className="text-3xl font-bold text-center">
@@ -637,7 +712,6 @@ export default function App() {
           </div>
           </div>
         )} 
-
         {step == "Cost" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             <h1 className="text-3xl font-bold text-center">
@@ -661,7 +735,6 @@ export default function App() {
             </button>
           </div>
         )}
-
         {step === "resultinstallcost" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             <h2 className="text-2xl font-semibold">Approximate Cost</h2>
@@ -672,7 +745,7 @@ export default function App() {
                 : "Approximate Cost of Carpet"}
             </p>
 
-            <p className="text-5xl font-bold text-blue-600">${grandTotal}</p>
+            <p className="text-5xl font-bold text-blue-600">{formatMoney(grandTotal)}</p>
 
             <button
               className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
@@ -683,6 +756,225 @@ export default function App() {
           </div>
         )}
         </>
+      )}
+      {mode === "maintenance" && (
+        <>
+        {step === "Maintenance" && (
+          <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+            <h1 className="text-3xl font-bold text-center">
+              This Section Is Currently Not Available
+            </h1>
+
+            <button
+              className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+              onClick={resetApp}
+            >
+              Main Menu
+            </button>
+          </div>
+        )}
+        </>
+      )}
+      {mode === "rooms" && (
+        <>
+        <button
+          onClick={resetApp}
+          className="fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-600 font-semibold transition"
+        >
+          Main Menu
+        </button>
+
+        {step === "decideFloorRooms" && (
+          <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+            <h1 className="text-xl font-bold text-center">
+              What flooring is being put in?
+            </h1>
+
+            <div className="grid grid-cols-3 gap-4">
+              <button
+                className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+                onClick={() => {
+
+                }}
+              >
+                Vinyl Click
+              </button>
+
+              <button
+                className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+                onClick={() => {
+
+                }}
+              >
+                Vinyl Glue
+              </button>
+
+              <button
+                className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+                onClick={() => {
+
+                }}
+              >
+                Vinyl Sheet
+              </button>
+
+              <button
+                className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+                onClick={() => {
+
+                }}
+              >
+                Laminate
+              </button>
+
+              <button
+                className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+                onClick={() => {
+
+                }}
+              >
+                Hardwood
+              </button>
+
+              <button
+                className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+                onClick={() => {
+
+                }}
+              >
+                Carpet
+              </button>
+
+              <button
+                className="col-start-2 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+                onClick={() => {
+
+                }}
+              >
+                Tile
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === "rooms" && (
+          <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+            <h1 className="text-xl font-bold text-center">
+              Enter Room Size (ft)
+            </h1>
+
+            <input
+              type="number"
+              placeholder="width"
+              value={roomInput.width}
+              className="border p-4 w-full text-lg rounded-lg"
+              onChange={(e) =>
+                setRoomInput({
+                  ...roomInput,
+                  width: parseFloat(e.target.value) || "",
+                })
+              }
+            />
+
+            <input
+              type="number"
+              placeholder="length"
+              value={roomInput.length}
+              className="border p-4 w-full text-lg rounded-lg"
+              onChange={(e) =>
+                setRoomInput({
+                  ...roomInput,
+                  length: parseFloat(e.target.value) || "",
+                })
+              }
+            />
+
+            <div className="text-left">
+              {rooms.map((room, i) => (
+                <p key={i}>
+                  Room {i + 1}: {room.width} x {room.length}
+                </p>
+              ))}
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                className="flex-1 py-4 bg-blue-600 text-white rounded-xl"
+                onClick={() => {
+                  if (!roomInput.width || !roomInput.length) return;
+
+                  addRoom({ ...roomInput });
+                  setRoomInput({ width: 0, length: 0 });
+                }}
+              >
+                Add Another Room
+              </button>
+
+              <button
+                className="flex-1 py-4 bg-green-600 text-white rounded-xl"
+                onClick={() => {
+                  addRoom({ ...roomInput });
+                  setStep("roomCost");
+                }}
+              > That's All 
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === "roomCost" && (
+          <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+            <h1 className="text-3xl font-bold"
+            >
+              Cost per sq ft
+            </h1>
+
+            <input
+              type="number"
+              placeholder="$ / sqft"
+              className="border p-4 w-full text-lg rounded-lg"
+              onChange={(e) => 
+                setRoomCost(parseFloat(e.target.value) || 0)
+              }
+            />
+
+            <button
+              className="w-full py-4 bg-blue-600 text-white rounded-xl"
+              onClick={calculateRoomTotal}
+            >
+              Calculate
+            </button>
+          </div>
+        )}
+
+        {step === "roomResult" && (
+          <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+            <h2 className="text-2xl font-semibold"
+            >
+              Room Total
+            </h2>
+
+            <p>
+              Total Area: {getTotalArea()} sqft
+            </p>
+
+            <p className="text-5xl font-bold text-green-600">
+              {roomTotal?.toLocaleString("en-CA", {
+                style: "currency",
+                currency: "CAD"
+              })}
+            </p>
+
+            <button
+              className="w-full py-4 bg-blue-600 text-white rounded-xl"
+              onClick={resetApp}
+            >
+              Main Menu
+            </button>
+          </div>
+        )}
+
+        </>  
       )}
 
     </div>

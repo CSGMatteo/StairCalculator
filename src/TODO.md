@@ -17,14 +17,19 @@
 - Added the runner calculation to the instal just the install cost
 - Added Binding to Calculations
 - Add correct costs for installing of different types of stairs
+- Pushed the code and test it
+- Added Main Menu Button on all stair steps
+- Added "In" to the text input of Runner Width
+- Adjust final total to be correct viewing ($X.XX)
+- Added room calc section
+- Added basic input room + price calc
 
 
 
 ## NEXT
 
-- push the code and test it
 - Add additional types of stairs to fill every application
-- Add potential other menu for other calculations
+- Improve room section
 
 
 ## BUGS
