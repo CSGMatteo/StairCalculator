@@ -3,6 +3,7 @@ import { Card, CardContent } from "./components/ui/card.jsx";
 import { Button } from "./components/ui/button.jsx";
 import './index.css'
 import { parse } from "postcss";
+import ScannerModal from "./components/ScannerModal.jsx";
 
 
 // Piece definitions (feet)
@@ -206,7 +207,8 @@ export default function App() {
 
   const backgroundClass = backgrounds[mode] || "bg-gray-100";
 
-  
+  const [scannerOpen, setScannerOpen] = useState(false)
+  const [scannedItem, setScannedItem] = useState(null)
 
   const [counts, setCounts] = useState({
     box: 0,
@@ -477,6 +479,23 @@ export default function App() {
           >
             Other
           </button>
+
+          <button
+            className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+            onClick={() => setScannerOpen(true)}
+          >
+            Scan Product
+          </button>
+
+          {scannerOpen && (
+            <ScannerModal
+              onClose={() => setScannerOpen(false)}
+              onSelect={(item) => {
+                setScannedItem(item);
+                setScannerOpen(false);
+              }}
+            />
+          )}
         </div>
       )}
       {mode === "stairs" && (
