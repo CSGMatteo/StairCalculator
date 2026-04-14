@@ -23,11 +23,18 @@
 - Adjust final total to be correct viewing ($X.XX)
 - Added room calc section
 - Added basic input room + price calc
-
+- Added static cost for minimum and base install rates
+- Added more steps to determine type of flooring to be installed and how.
+- Added product sqft/box input and calculations for number of boxes
+- Added a page to be used for additional costs, layout but no actuall function
 
 
 ## NEXT
 
+- Possibly adjust order and layout for Roomsqft + Waste into Productsqft
+- Add calculations of install
+- Add full calculations with product + install
+- Add accessories to the calculations
 - Add additional types of stairs to fill every application
 - Improve room section
 
