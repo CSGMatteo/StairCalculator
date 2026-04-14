@@ -9,5 +9,5 @@
 
 .animate-gradient {
     background-size: 200% 200%;
-    animation: gradientMove 8s ease infinite;
+    animation: gradientMove s ease infinite;
 }
