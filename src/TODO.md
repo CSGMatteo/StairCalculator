@@ -27,10 +27,20 @@
 - Added more steps to determine type of flooring to be installed and how.
 - Added product sqft/box input and calculations for number of boxes
 - Added a page to be used for additional costs, layout but no actuall function
+- Added Trim to the additional page
+- Added Furniture page layout
+- Added other extras page layout
+- Added Removal selct as well as implemented it into the cost for the calculation of price
+- Added function to clear other extras if needed
+- Tried to revamp trim section (didn't work)
+- Trim fixed and should be up and operational
+- Add Scanner as global button on room calc pages
 
 
 ## NEXT
 
+
+- Add more to the additionals page and improve on whats already there
 - Possibly adjust order and layout for Roomsqft + Waste into Productsqft
 - Add calculations of install
 - Add full calculations with product + install

@@ -104,6 +104,12 @@ function calculateLength(pieces, landingHeight = 0) {
 // #region Room Global Constants
 const WASTE_FACTOR = 1.05
 
+const INITIAL_FURNITURE = {
+  furniture: { amount: 0, cost: 100 },
+  appliance: { amount: 0, cost: 50 },
+  furnitureLg: { amount: 0, cost: 200},
+}
+
 const INITIAL_EXTRAS = {
   trim: { selected: false, cost: 0 },
   transitions: { selected: false, cost: 0 },
@@ -122,7 +128,6 @@ const REMOVAL_COSTS = {
   tile: 9.50,
 };
 
-//#region Trim G-Constants
 const TRIM_TYPES = {
   "4in": { cost: 1.00, length: 12 },
   "5in": { cost: 1.50, length: 12 },
@@ -136,34 +141,6 @@ const TRIM_INSTALL_RATES = {
   doorstop: 2.00
 };
 
-//#endregion
-
-//#region Floor Prep G-Constants
-const FLOOR_PREP_TYPES = [
-  { key: "patch", label: "Patch / Repair" },
-  { key: "underlayment", label: "Underlayment" },
-  { key: "leveling", label: "Self Leveling" },
-];
-
-const FLOOR_PREP_RATES = {
-  patch: 2.0,
-  underlayment: 5.0,
-  leveling: 1.0
-};
-
-//#endregion
-
-//#region Furniture G-Constants
-
-const INITIAL_FURNITURE = {
-  furniture: { amount: 0, cost: 100 },
-  appliance: { amount: 0, cost: 50 },
-  furnitureLg: { amount: 0, cost: 200},
-}
-
-//#endregion
-
-//#region Vent G-Constants
 const VENT_COSTS = {
   "4x10_black": 35.00,
   "4x10_grey": 45.00,
@@ -175,9 +152,6 @@ const VENT_COSTS = {
 };
 
 const VENT_INSTALL_COST = 35; 
-
-//#endregion
-
 
 const FLOORING = {
   vinylClick: {
@@ -217,19 +191,12 @@ const FLOORING = {
 
 const MATERIAL_RULES = {
   vinylGlue: [
-    { name: "Glue", coverage: 500, cost: 175 }
-  ],
-
-  Carpet: [
-    { name: "Pad", coverage: 1, cost: 0.85}
+    { name: "Glue", coverage: 500, cost: 175 },
+    { name: "Mahogany", coverage: 32, cost: 65 }
   ],
 
   Laminate: [
     { name: "Pad", coverage: 100, cost: 40, condition: (state) => !state.laminateHasPad }
-  ],
-
-  VinylSheet: [
-    { name: "Glue", coverage: 500, cost: 175 }
   ],
 
   Hardwood: [
@@ -332,9 +299,6 @@ export default function App() {
   const [roomTrim, setRoomTrim] = useState([]);
 
   const [trimLength, setTrimLength] = useState(null);
-
-  const [floorPrepItems, setFloorPrepItems] = useState([]);
-  const [currentPrep, setCurrentPrep] = useState(null);
 
   const [furniture, setFurniture]  = useState(INITIAL_FURNITURE);
 
@@ -544,12 +508,12 @@ export default function App() {
 
     if (boxsqft > 0) {
       totalArea = Math.ceil(roomsArea / boxsqft) * boxsqft
-      setNumberOfBoxes(totalArea / boxsqft)
     } else {
       totalArea = roomsArea;
       setNumberOfBoxes(0);
     }
 
+    setNumberOfBoxes(totalArea / boxsqft)
     return(totalArea)
   }
 
@@ -562,13 +526,8 @@ export default function App() {
     const materialCost = calculateMaterialCosts();
     const installCost = calculateInstallCost();
 
-    const total = (productCost + removalCost + extrasCost + materialCost + installCost) * 1.13;
+    const total = productCost + removalCost + extrasCost + materialCost + installCost;
 
-    console.log("Product Cost:", productCost)
-    console.log("Removal Cost:", removalCost)
-    console.log("Extras Cost:", extrasCost)
-    console.log("Material Cost:", materialCost)
-    console.log("Install Cost:", installCost)
     setRoomTotal(total);
     setStep("roomResult");
   }
@@ -664,7 +623,6 @@ export default function App() {
     setStep("additionals")
   }
 
-  // #region Trim Logic
   function initializeRoomTrim() {
     const initial = rooms.map((room, index) => ({
       roomIndex: index,
@@ -787,40 +745,19 @@ export default function App() {
     setStep("additionals");
   }
 
-  // #endregion
+  function calculateTrim() {
+    let totalTrimLength = 0
+    let totalTrimCost = 0
+    const baseLength = 12
+    const baseCost = 1.5
 
-  // #region Floor Prep Logic
-  function getRoomArea(room) {
-    return (room.length || 0) * (room.width || 0);
+    totalTrimLength = Math.ceil(trimLength / baseLength) * baseLength
+
+    totalTrimCost = (totalTrimLength * baseCost )
+
+    completeExtra("trim", totalTrimCost)
+    setStep("additionals")
   }
-
-  function getTotalArea() {
-    return rooms.reduce((total, room) => {
-      return total + getRoomArea(room);
-    }, 0);
-  }
-
-  function calculateFloorPrepTotal() {
-    return floorPrepItems.reduce((total, item) => {
-      let affectedArea = 0;
-
-      if (item.scope === "global") {
-        affectedArea = getTotalArea();
-      } else {
-        affectedArea = item.rooms.reduce((sum, roomIndex) => {
-          return sum + getRoomArea(rooms[roomIndex]);
-        }, 0);
-      }
-
-      const rate = FLOOR_PREP_RATES[item.type] || 0;
-
-      return total + affectedArea * rate;
-    }, 0);
-  }
-  
-  //#endregion
-
-  // #region Furniture Logic
 
   function changeFurniture(type, amount) {
     setFurniture(prev => ({
@@ -841,8 +778,6 @@ export default function App() {
       setStep("additionals");
     }
 
-    // #endregion
-
   function resetExtra(extraKey) {
     setExtras(prev => ({
       ...prev,
@@ -852,8 +787,6 @@ export default function App() {
       }
     }));
   }
-
-  // #region Vent Logic
 
   function addVent() {
     setVents(prev => [
@@ -893,8 +826,6 @@ export default function App() {
  function removeVent(index) {
   setVents(prev => prev.filter((_, i) => i !== index));
  }
-
- //#endregion
  //#endregion
 
   function resetApp() {
@@ -965,8 +896,8 @@ export default function App() {
           <button
             className="w-full text-xl py-6 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition"
             onClick={() => {
-              setmode("maintenance")
-              setStep("Maintenance");
+              setmode("rooms")
+              setStep("decideFloorRooms");
             }}
           >
             Room Calculator
@@ -1570,12 +1501,7 @@ export default function App() {
             </button>
             <button
               className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-              onClick={() => {
-                if (selectedFloor === "Carpet") {
-                  setStep("roomInstall")
-                } else {
-                  setStep("roomProductInfo")}
-              }}
+              onClick={() => setStep("roomProductInfo")}
             >
               Calculate Cost
             </button>
@@ -1585,7 +1511,7 @@ export default function App() {
         {step === "roomProductInfo" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             <h1 className="text-3xl font-bold text-center">
-              How many sqft per box?
+              How much sqft per box?
             </h1>
 
             <input
@@ -1600,9 +1526,7 @@ export default function App() {
             <div className="grid grid-cols-2 gap-4">
               <button
                 className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                onClick={() => {
-                  setRoomInstall(false)
-                  setStep("roomCost")}}
+                onClick={() => {setStep("roomCost")}}
               >
                 Just Product
               </button>
@@ -1845,7 +1769,7 @@ export default function App() {
                   : "bg-blue-600 hover:bg-blue-700"
                 } text-white rounded-xl font-semibold transition`}
                 onClick={() => {
-                  if ((rooms?.length || 0) === 1) {
+                  if ((room?.length || 0) === 1) {
                     setTrimMode("global");
                     setStep("trimGlobalMethod");
                   } else {
@@ -1878,7 +1802,7 @@ export default function App() {
                   : "bg-blue-600 hover:bg-blue-700"
                 } text-white rounded-xl font-semibold transition`}
                 onClick={() => {
-                  setStep("floorPrepSelect")
+                  setStep("floorPrep")
                 }}
               >
                 Floor Prep {extras.floorPrep.selected && `✔ ($${extras.floorPrep.cost})`}
@@ -2128,119 +2052,43 @@ export default function App() {
             </button>
           </div>
         )}
-        
+
+        {step === "trim" && (
+          <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
+            <h1 className="text-3xl font-bold"
+            >
+              Total amount of length to cover?
+            </h1>
+
+            <input
+              type="number"
+              placeholder="Linear ft"
+              className="border p-4 w-full text-lg rounded-lg"
+              onChange={(e) =>
+                setTrimLength(parseFloat(e.target.value) || 0)
+              }
+            />
+
+            <button
+              className="w-full py-4 bg-blue-600 text-white rounded-xl"
+              onClick={calculateTrim}
+            >
+              Calculate Trim
+            </button>
+          </div>
+        )}
+
         {step === "transitions" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             
           </div>
         )}
 
-        {step === "floorPrepSelect" && (
+        {step === "floorPrep" && (
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
             <h1 className="text-3xl font-bold">
-              Select Floor Prep
+              
             </h1>
-
-            {FLOOR_PREP_TYPES.map((prep) => (
-              <button
-                key={prep.key}
-                className="w-full bg-blue-600 text-white p-4 rounded-xl"
-                onClick={() => {
-                  setCurrentPrep({
-                    type: prep.key,
-                    scope: "",
-                    rooms: [],
-                    cost: 0,
-                    extra: []
-                  });
-                  setStep("floorPrepScope");
-                }}
-              >
-                {prep.label}
-              </button>
-            ))}
-
-            {/* Done button */}
-            <button
-              className="w-full bg-green-600 text-white p-4 rounded-xl"
-              onClick={() => completeExtra("floorPrep", calculateFloorPrepTotal())}
-            >
-              Done
-            </button>
-          </div>
-        )}
-
-        {step === "floorPrepScope" && (
-          <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-            <h1 className="text-2xl font-bold">
-              Apply to all rooms?
-            </h1>
-
-            <button
-              className="w-full bg-blue-600 text-white p-4 rounded-xl"
-              onClick={() => {
-                const updated = {
-                  ...currentPrep,
-                  scope: "global"
-                };
-
-                setFloorPrepItems(prev => [...prev, updated]);
-                setCurrentPrep(null);
-                setStep("floorPrepSelect");
-              }}
-            >
-              Yes
-            </button>
-
-            <button
-              className="w-full bg-blue-600 text-white p-4 rounded-xl"
-              onClick={() => {
-                setCurrentPrep(prev => ({
-                  ...prev,
-                  scope: "separate"
-                }));
-                setStep("floorPrepRooms");
-              }}
-            >
-              No
-            </button>
-          </div>
-        )}
-
-        {step === "floorPrepRooms" && (
-          <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-            <h1 className="text-3xl font-bold">
-              Select Rooms
-            </h1>
-
-            {rooms.map((room, index) => (
-              <label key={index} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    setCurrentPrep(prev => {
-                      const updatedRooms = e.target.checked
-                        ? [...prev.rooms, index]
-                        : prev.rooms.filter(r => r !== index);
-                      
-                      return { ...prev, rooms: updatedRooms };
-                    });
-                  }}
-                />
-                Room {index + 1}
-              </label>
-            ))}
-
-            <button
-              className="w-full bg-green-600 text-white p-4 rounded-xl"
-              onClick={() => {
-                setFloorPrepItems(prev => [...prev, currentPrep]);
-                setCurrentPrep(null);
-                setStep("floorPrepSelect");
-              }}
-            >
-              Confirm
-            </button>
           </div>
         )}
 
@@ -2462,11 +2310,16 @@ export default function App() {
             >
               Room Total
             </h2>
-            {(numberOfBoxes ?? 0) > 1 && (
-              <p>
-                Number of Cartons: {numberOfBoxes} Cartons
-              </p>
-            )}
+            
+            {/*}
+            <p>
+              Total Area: {getRoomsArea()} sqft
+            </p>
+            */}
+
+            <p>
+              Number of Cartons: {numberOfBoxes} Cartons
+            </p>
 
             <p className="text-5xl font-bold text-green-600">
               {roomTotal?.toLocaleString("en-CA", {
