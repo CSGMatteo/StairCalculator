@@ -4,7 +4,7 @@ import { Button } from "./components/ui/button.jsx";
 import './index.css'
 import { parse } from "postcss";
 import ScannerModal from "./components/ScannerModal.jsx";
-
+import SampleSignOut from "./components/SampleSignOut.jsx";
 
 // #region Carpet Global Constants
 // Piece definitions (feet)
@@ -241,7 +241,7 @@ const MATERIAL_RULES = {
 
 export default function App() {
   
-  const [mode, setmode] = useState("menu");
+  const [mode, setMode] = useState("menu");
   const [step, setStep] = useState("main");
  
   const formatMoney = (value) =>
@@ -254,7 +254,8 @@ export default function App() {
     menu: "bg-gradient-to-br from-blue-500 to-indigo-700",
     stairs: "bg-gradient-to-br from-cyan-500 to-indigo-700",
     maintenance: "bg-gradient-to-br from-amber-400 to-orange-600",
-    rooms: "bg-gradient-to-br from-cyan-500 to-indigo-700"
+    rooms: "bg-gradient-to-br from-cyan-500 to-indigo-700",
+    sampleSignOut: "bg-gradient-to-br from-green-500 to-blue-700"
   };
 
   const backgroundClass = backgrounds[mode] || "bg-gray-100";
@@ -898,7 +899,7 @@ export default function App() {
  //#endregion
 
   function resetApp() {
-  setmode("menu")
+  setMode("menu")
   setStep("main");
   setLanding(false);
   setLandingSize({ w: 0, h: 0 });
@@ -955,7 +956,7 @@ export default function App() {
           <button
             className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
             onClick={() => {
-              setmode("stairs")
+              setMode("stairs")
               setStep("StairCalc")
             }}
           >
@@ -965,8 +966,8 @@ export default function App() {
           <button
             className="w-full text-xl py-6 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition"
             onClick={() => {
-              setmode("maintenance")
-              setStep("Maintenance");
+              setMode("rooms")
+              setStep("decideFloorRooms");
             }}
           >
             Room Calculator
@@ -975,11 +976,11 @@ export default function App() {
           <button
             className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
             onClick={() => {
-              setmode("maintenance")
-              setStep("Maintenance")
+              console.log("CLICK WORKS")
+              setMode("sampleSignOut")
             }}
           >
-            Other
+            Sample Sign Out
           </button>
 
           <button
@@ -1000,6 +1001,11 @@ export default function App() {
           )}
         </div>
       )}
+
+      {mode === "sampleSignOut" && (
+        <SampleSignOut setMode={setMode} />
+      )}
+
       {mode === "stairs" && (
         <>
         <button
