@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1VMPWmQUbbHK0JE_8ldfsc2G454vVPkFnLhjATuVKil8/export?format=csv";
 
+const SHEET_VIEW_URL =
+  "https://docs.google.com/spreadsheets/d/1VMPWmQUbbHK0JE_8ldfsc2G454vVPkFnLhjATuVKil8/edit?gid=0#gid=0"
+
 export default function ScannerModal({ onClose, onSelect }) {
   const videoRef = useRef(null);
 
@@ -11,6 +14,7 @@ export default function ScannerModal({ onClose, onSelect }) {
   const [scanLocked, setScanLocked] = useState(false);
   const [result, setResult] = useState(null);
   const [search, setSearch] = useState("");
+  
 
   /* ================= LOAD INVENTORY ================= */
 
@@ -131,6 +135,12 @@ export default function ScannerModal({ onClose, onSelect }) {
     onClose();        // close modal
   }
 
+  const openSpreadsheet = () => {
+    window.open(SHEET_VIEW_URL, "_blank");
+  };
+
+  
+
   /* ================= UI ================= */
 
   return (
@@ -207,6 +217,13 @@ export default function ScannerModal({ onClose, onSelect }) {
             </>
           )}
         </div>
+
+        <button
+          className="w-full mt-3 py-3 text-lg bg-blue-600 hover:bg-blue-700 border border-blue-800 rounded-xl shadow-md font-semibold text-white transition"
+          onClick={openSpreadsheet}
+        >
+          Open Spreadsheet
+        </button>
 
         <button
           className="w-full mt-3 py-3 text-lg bg-blue-600 hover:bg-blue-700 border border-blue-800 rounded-xl shadow-md font-semibold text-white transition"
