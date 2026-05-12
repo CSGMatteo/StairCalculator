@@ -235,9 +235,9 @@ export default function StairCalculator({ setMode }) {
     function BindingCalc() {
         const BindingCost = 1.5
 
-        return(
-            (getLandingPerimeter() + (getRunnerLength() * 2)) * BindingCost
-        );
+        return runner
+            ? (getLandingPerimeter() + (getRunnerLength() * 2)) * BindingCost
+            : 0;
     }
 
     function getInstallCost(key) {
