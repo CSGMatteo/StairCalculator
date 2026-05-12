@@ -5,7 +5,7 @@ export default function SampleSignOut({ setMode }) {
 
   const [scannerOpen, setScannerOpen] = useState(false)
 
-  const [step, setStep] = useState("info");
+  const [step, setStep] = useState("signOutOptions");
 
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
@@ -102,6 +102,39 @@ export default function SampleSignOut({ setMode }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-10 space-y-6">
+
+      {step === "signOutOptions" && (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold text-center">
+          Returning or Signing Out?
+        </h1>
+        <button
+          className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+          onClick={() => setStep("info")}
+        >
+          Sign Out Samples
+        </button>
+
+        <button
+          className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
+          onClick={() => {
+            window.open(
+              "https://docs.google.com/spreadsheets/d/1VMPWmQUbbHK0JE_8ldfsc2G454vVPkFnLhjATuVKil8/edit?gid=695013411#gid=695013411",
+              "_blank"
+            );
+          }}
+        >
+          Return Samples
+        </button>
+
+        <button
+          className="w-full text-xl py-6 bg-gray-400 hover:bg-gray-500 text-black rounded-xl font-semibold transition"
+          onClick={() => setMode("menu")}
+        >
+          Main Menu
+        </button>
+      </div>
+      )}
 
       {/* INFO STEP */}
       {step === "info" && (

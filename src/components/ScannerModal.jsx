@@ -134,10 +134,12 @@ export default function ScannerModal({ onClose, onSelect }) {
   /* ================= UI ================= */
 
   return (
-    <div style={styles.overlay}>
+    <div className="fixed top-0 left-0 w-screen h-screen bg-black/80 flex items-center justify-center z-[9999]">
       <div style={styles.modal}>
 
-        <h2>💲 Price Checker</h2>
+        <h2 className="text-3xl font-bold text-center text-blue-600 mb-4">
+          <span className="mr-2">💲</span>Price Checker <span className="mr-2">💲</span>
+        </h2>
 
         <div style={styles.videoBox}>
           <video ref={videoRef} style={styles.video} />
@@ -148,10 +150,13 @@ export default function ScannerModal({ onClose, onSelect }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && manualSearch()}
-          style={styles.input}
+          className="w-full p-3 text-lg mt-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500"
         />
 
-        <button onClick={manualSearch} style={styles.button}>
+        <button
+          className="w-full mt-3 py-3 text-lg bg-blue-600 hover:bg-blue-700 border border-blue-800 rounded-xl shadow-md font-semibold text-white transition" 
+          onClick={manualSearch} 
+        >
           Search
         </button>
 
@@ -169,10 +174,20 @@ export default function ScannerModal({ onClose, onSelect }) {
             <>
               <div>{result.item["Item Name"]}</div>
               <div style={styles.price}>{result.item["Price"]}</div>
-              <button onClick={() => handleSelect(result.item)}>
-                Use This
-              </button>
-              <button onClick={unlock}>Scan Next</button>
+              <div className="flex gap-4 mt-4">
+                <button 
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 border border-blue-800 py-3 rounded-xl shadow-xl text-white font-semibold transition"
+                  onClick={() => handleSelect(result.item)}
+                >
+                  Use This
+                </button>
+                <button 
+                  className="flex-1 bg-green-600 hover:bg-green-700 border border-green-800 py-3 rounded-xl shadow-xl text-white font-semibold transition"
+                  onClick={unlock}
+                >
+                  Scan Next
+                </button>
+              </div>
             </>
           )}
 
@@ -193,7 +208,10 @@ export default function ScannerModal({ onClose, onSelect }) {
           )}
         </div>
 
-        <button onClick={onClose} style={styles.close}>
+        <button
+          className="w-full mt-3 py-3 text-lg bg-blue-600 hover:bg-blue-700 border border-blue-800 rounded-xl shadow-md font-semibold text-white transition"
+          onClick={onClose}
+        >
           Close
         </button>
 
@@ -208,7 +226,7 @@ const styles = {
   overlay: {
     position: "fixed",
     inset: 0,
-    background: "rgba(0,0,0,0.6)",
+    background: "black",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
