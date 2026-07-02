@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ScannerModal from "../ScannerModal";
+import ScannerModal from "./ScannerModal";
 
 export default function StairCalculator({ setMode }) {
 
