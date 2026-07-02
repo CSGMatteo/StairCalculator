@@ -4,9 +4,6 @@ import ScannerModal from "../ScannerModal";
 export default function StairCalculator({ setMode }) {
 
     
-    const [scannerOpen, setScannerOpen] = useState(false);
-    const [scannedItem, setScannedItem] = useState(null);
-    
     const PIECE_TYPES = {
         box: { w:3, h: 1.75 },
         open1: { w: 4, h: 1.75 },
