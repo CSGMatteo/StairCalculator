@@ -7,7 +7,11 @@ import ScannerModal from "./components/ScannerModal.jsx";
 import SampleSignOut from "./components/SampleSignOut.jsx";
 import StairCalculator from "./components/StairCalculator.jsx";
 import RoomCalculator from "./components/RoomCalculator.jsx";
-
+import Maintenance from "./components/Maintenance.jsx";
+import VinylClickRoom from "./components/RoomCalculators/VinylClickRoom.jsx";
+import VinylGlueRoom from "./components/RoomCalculators/VinylGlueRoom.jsx";
+import LaminateRoom from "./components/RoomCalculators/LaminateRoom.jsx";
+import HardwoodRoom from "./components/RoomCalculators/HardwoodRoom.jsx";
 
 
 export default function App() {
@@ -26,7 +30,11 @@ export default function App() {
     stairs: "bg-gradient-to-br from-cyan-500 to-indigo-700",
     maintenance: "bg-gradient-to-br from-amber-400 to-orange-600",
     rooms: "bg-gradient-to-br from-cyan-500 to-indigo-700",
-    sampleSignOut: "bg-gradient-to-br from-green-500 to-blue-700"
+    sampleSignOut: "bg-gradient-to-br from-green-500 to-blue-700",
+    vinylClickRoom: "bg-gradient-to-br from-cyan-500 to-indigo-700",
+    vinylGlueRoom: "bg-gradient-to-br from-cyan-500 to-indigo-700",
+    laminateRoom: "bg-gradient-to-br from-cyan-500 to-indigo-700",
+    hardwoodRoom: "bg-gradient-to-br from-cyan-500 to-indigo-700",
   };
 
   const backgroundClass = backgrounds[mode] || "bg-gray-100";
@@ -74,6 +82,15 @@ export default function App() {
           </button>
 
           <button
+            className="w-full text-xl py-6 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-semibold transition"
+            onClick={() => {
+              setMode("maintenance")
+            }}
+          >
+            Out of Order
+          </button>
+
+          <button
             className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
             onClick={() => {
               console.log("CLICK WORKS")
@@ -111,26 +128,28 @@ export default function App() {
       )}
 
       {mode === "maintenance" && (
-        <>
-        {step === "Maintenance" && (
-          <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-            <h1 className="text-3xl font-bold text-center">
-              This Section Is Currently Not Available
-            </h1>
-
-            <button
-              className="w-full text-xl py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-              onClick={resetApp}
-            >
-              Main Menu
-            </button>
-          </div>
-        )}
-        </>
+        <Maintenance 
+          onBack={() => setMode("menu")} />
       )}
 
       {mode === "rooms" && (
         <RoomCalculator setMode={setMode} />
+      )}
+
+      {mode === "vinylClickRoom" && (
+        <VinylClickRoom setMode={setMode} />
+      )}
+
+      {mode === "vinylGlueRoom" && (
+        <VinylGlueRoom setMode={setMode} />
+      )}
+
+      {mode === "laminateRoom" && (
+        <LaminateRoom setMode={setMode} />
+      )}
+
+      {mode === "hardwoodRoom" && (
+        <HardwoodRoom setMode={setMode} />
       )}
 
     </div>

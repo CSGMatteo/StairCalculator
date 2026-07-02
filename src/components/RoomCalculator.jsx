@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import ScannerModal from "./ScannerModal";
+import Maintenance from "./Maintenance";
+import VinylClickRoom from "./RoomCalculators/VinylClickRoom";
 
-export default function RoomCalculator({ setMode}) {
-
-    const WASTE_FACTOR = 1.05
+export default function RoomCalculator({ setMode }) {
 
     const INITIAL_EXTRAS = {
         trim: { selected: false, cost: 0 },
@@ -12,15 +12,6 @@ export default function RoomCalculator({ setMode}) {
         furniture: { selected: false, cost: 0 },
         vents: { selected: false, cost: 0 },
         other: { selected: false, cost: 0 },
-    };
-
-    const REMOVAL_COSTS = {
-        carpet: 0.60,
-        vinylClick: 1.15,
-        vinylGlue: 1.75,
-        laminate: 1.15,
-        hardwood: 2.25,
-        tile: 9.50,
     };
 
     const TRIM_TYPES = {
@@ -65,64 +56,6 @@ export default function RoomCalculator({ setMode}) {
     };
 
     const VENT_INSTALL_COST = 35;
-
-    const FLOORING = {
-        vinylClick: {
-            minInstall: 375,
-            installRate: 2.25
-        },
-        vinylGlue: {
-            minInstall: 375,
-            installRate: 1.95
-        },
-        vinylSheet: {
-            minInstall: 300,
-            installRate: 0
-        },
-        Laminate: {
-            minInstall: 350,
-            installRate: 2.35
-        },
-        Hardwood: {
-            minInstall: 0,
-            rates: {
-                nailDown: 2.75,
-                floating: 2.95,
-                fullSpread: 4.75,
-                glueAssist: 3.00
-            }
-        },
-        Carpet: {
-            minInstall: 300,
-            installRate: 0.95
-        },
-        Tile: {
-            minInstall: 0,
-            installRate: 0
-        },
-    }
-
-    const MATERIAL_RULES = {
-        vinylGlue: [
-            { name: "Glue", coverage: 500, cost: 175 }
-        ],
-
-        Carpet: [
-            { name: "Pad", coverage: 1, cost: 0.85 }
-        ],
-
-        Laminate: [
-            { name: "Pad", coverage: 100, cost: 40, condition: (state) => !state.laminateHasPad }
-        ],
-
-        VinylSheet: [
-            { name: "Glue", coverage: 500, cost: 175 }
-        ],
-
-        Hardwood: [
-            { name: "Glue", coverage: 60, cost: 30, condition: (state) => state.hardwoodType === "glueAssist" }
-        ]
-    };
 
     const [step, setStep] = useState("decideFloorRooms")
 
@@ -640,10 +573,7 @@ export default function RoomCalculator({ setMode}) {
                     <div className="grid grid-cols-3 gap-4">
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setSelectedFloor("vinylClick")
-                                setVinylClickInstall(true)
-                                setStep("roomsInput")
+                            onClick={() => {setMode("vinylClickRoom")
                             }}
                         >
                             Vinyl Click
@@ -651,10 +581,7 @@ export default function RoomCalculator({ setMode}) {
 
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setSelectedFloor("vinylGlue")
-                                setVinylGlueInstall(true)
-                                setStep("roomsInput")
+                            onClick={() => {setMode("vinylGlueRoom")
                             }}
                         >
                             Vinyl Glue
@@ -662,10 +589,7 @@ export default function RoomCalculator({ setMode}) {
 
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setSelectedFloor("vinylSheet")
-                                setVinylSheetInstall(true)
-                                setStep("roomsInput")
+                            onClick={() => {setMode("maintenance")
                             }}
                         >
                             Vinyl Sheet
@@ -673,10 +597,7 @@ export default function RoomCalculator({ setMode}) {
 
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setSelectedFloor("Laminate")
-                                setLaminateInstall(true)
-                                setStep("roomsInput")
+                            onClick={() => {setMode("laminateRoom")
                             }}
                         >
                             Laminate
@@ -684,10 +605,7 @@ export default function RoomCalculator({ setMode}) {
 
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setSelectedFloor("Hardwood")
-                                setHardwoodInstall(true)
-                                setStep("roomsInput")
+                            onClick={() => {setMode("hardwoodRoom")
                             }}
                         >
                             Hardwood
@@ -695,10 +613,7 @@ export default function RoomCalculator({ setMode}) {
 
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setSelectedFloor("Carpet")
-                                setCarpetInstall(true)
-                                setStep("roomsInput")
+                            onClick={() => {setMode("maintenance")
                             }}
                         >
                             Carpet
@@ -706,338 +621,12 @@ export default function RoomCalculator({ setMode}) {
 
                         <button
                             className="col-start-2 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setSelectedFloor("Tile")
-                                setTileInstall(true)
-                                setStep("roomsInput")
+                            onClick={() => {setMode("maintenance")
                             }}
                         >
                             Tile
                         </button>
                     </div>
-                </div>
-            )}
-
-            {step === "roomsInput" && (
-                <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-                    <h1 className="text-xl font-bold text-center">
-                        Enter Room Size (ft)
-                    </h1>
-
-                    <input
-                        type="number"
-                        placeholder="width"
-                        value={roomInput.width}
-                        className="border p-4 w-full text-lg rounded-lg"
-                        onChange={(e) =>
-                            setRoomInput({
-                                ...roomInput,
-                                width: parseFloat(e.target.value) || "",
-                            })
-                        }
-                    />
-
-                    <input
-                        type="number"
-                        placeholder="length"
-                        value={roomInput.length}
-                        className="border p-4 w-full text-lg rounded-lg"
-                        onChange={(e) =>
-                            setRoomInput({
-                                ...roomInput,
-                                length: parseFloat(e.target.value) || "",
-                            })
-                        }
-                    />
-
-                    <div className="text-left">
-                        {rooms.map((room, i) => (
-                            <p key={i}>
-                                Room {i + 1}: {room.width} x {room.length}
-                            </p>
-                        ))}
-                    </div>
-
-                    <div className="flex gap-4">
-                        <button
-                            className="flex-1 py-4 bg-blue-600 text-white rounded-xl"
-                            onClick={() => {
-                                addRoom({ ...roomInput });
-                                setRoomInput({ width: 0, length: 0 });
-                            }}
-                        >
-                            Add Another Room
-                        </button>
-
-                        <button
-                            className="flex-1 py-4 bg-green-600 text-white rounded-xl"
-                            onClick={() => {
-                                addRoom({ ...roomInput });
-                                setStep("roomQuantity");
-                            }}
-                        >
-                            That's All
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {step === "roomQuantity" && (
-                <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-                    <h2 className="text-3xl font-bold text-center">
-                        Total square footage
-                    </h2>
-
-                    <p>
-                        Including waste
-                    </p>
-
-                    <p className="text-5xl font-bold text-blue-600">
-                        {getRoomsArea()} sqft
-                    </p>
-
-                    <button
-                        className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                        onClick={resetRoom}
-                    >
-                        Start Over
-                    </button>
-                    
-                    <button
-                        className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                        onClick={() => {
-                            if (selectedFloor === "Carpet") {
-                                setStep("roomInstall")
-                            } else {
-                                setStep("roomProductInfo")
-                            }
-                        }}
-                    >
-                        Calculate Cost
-                    </button>
-                </div>
-            )}
-
-            {step === "roomProductInfo" && (
-                <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-                    <h1 className="text-3xl font-bold text-center">
-                        How many sqft per box?
-                    </h1>
-
-                    <input
-                        type="number"
-                        placeholder="sqft/box"
-                        className="border p-4 w-full text-lg rounded-lg"
-                        onChange={(e) =>
-                            setBoxsqft(parseFloat(e.target.value) || 0)
-                        }
-                    />
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setRoomInstall(false)
-                                setStep("roomCost")
-                            }}
-                        >
-                            Just Product
-                        </button>
-
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setRoomInstall(true)
-                                if (selectedFloor === "Hardwood") {
-                                    setStep("hwInstallMethod")
-                                } else {
-                                    setStep("roomremoval")
-                                }
-                            }}
-                        >
-                            Install Costs
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {step === "roomInstall" && (
-                <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-                    <h1 className="text-3xl font-bold text-center">
-                        Are we installing?
-                    </h1>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setRoomInstall(true)
-                                if (selectedFloor === "Hardwood") {
-                                    setStep("hwInstallMethod")
-                                } else {
-                                    setStep("roomremoval")
-                                }
-                            }}
-                        >
-                            Yes
-                        </button>
-
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                                onClick={() => {
-                                    setRoomInstall(false)
-                                    setStep("roomremoval")
-                             }}
-                        >
-                             No
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {step === "hwInstallMethod" && (
-                <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-                    <h1 className="text-3xl font-bold text-center">
-                        How will the hardwood be put down?
-                    </h1>
-
-                    <div className="grid grid-cols-2 gap-4">
-
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setHardwoodType("nailDown")
-                                setStep("roomremoval")
-                            }}
-                        >
-                            Nail Down
-                        </button>
-
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setHardwoodType("floating")
-                                setStep("roomremoval")
-                            }}
-                        >
-                            Floating
-                        </button>
-
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setHardwoodType("fullSpread")
-                                setStep("roomremoval")
-                            }}
-                        >
-                            Full Spread
-                        </button>
-
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setHardwoodType("glueAssist")
-                                setStep("roomremoval")
-                            }}
-                        >
-                            Glue Assist
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {step === "roomremoval" && (
-                <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-                    <h1 className="text-3xl font-bold text-center">
-                        Is there removal?
-                    </h1>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setRoomRemoval(true)
-                                setStep("removalDetails")
-                            }}
-                        >
-                            Yes
-                        </button>
-
-                        <button
-                            className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
-                            onClick={() => {
-                                setRoomRemoval(false)
-                                setStep("additionals")
-                            }}
-                        >
-                            No
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {step === "removalDetails" && (
-                <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-                    <h1 className="text-2xl font-bold">
-                        What flooring is being removed in each room?
-                    </h1>
-
-                    <div className="mb-6">
-                        <p className="font-semibold mb-2"> Removal Type (All Rooms)</p>
-
-                        <select
-                            value={globalRemovalType}
-                            onChange={(e) => setGlobalRemovalType(e.target.value)}
-                            className="border p-2 rounded-lg w-full"
-                        >
-                            <option value="">Select Type</option>
-                            <option value="carpet">Carpet</option>
-                            <option value="vinylClick">Vinyl Click</option>
-                            <option value="vinylGlue">Vinyl Glue</option>
-                            <option value="laminate">Laminate</option>
-                            <option value="hardwood">Hardwood</option>
-                            <option value="tile">Tile</option>
-                        </select>
-                    </div>
-
-                    <div className="space-y-4 text-left">
-                        {rooms.map((room, index) => (
-                            <div
-                                key={index}
-                                className="flex justify-between items-center bg-gray-100 p-4 rounded-xl"
-                            >
-                                <p>
-                                    Room {index + 1}: {room.width} x {room.length}
-                                </p>
-
-                                <select
-                                    className="border p-2 rounded-lg w-full"
-                                    value={globalRemovalType || room.removalType}
-                                    disabled={!!globalRemovalType}
-                                    onChange={(e) => {
-                                        const updatedRooms = [...rooms];
-                                        updatedRooms[index].removalType = e.target.value;
-                                        setRooms(updatedRooms);
-                                    }}
-                                >
-                                    <option value="">Select Type</option>
-                                    <option value="carpet">Carpet</option>
-                                    <option value="vinylClick">Vinyl Click</option>
-                                    <option value="vinylGlue">Vinyl Glue</option>
-                                    <option value="laminate">Laminate</option>
-                                    <option value="hardwood">Hardwood</option>
-                                    <option value="tile">Tile</option>
-                                </select>
-                            </div>
-                        ))}
-                    </div>
-
-                    <button
-                        className="w-full py-4 bg-blue-600 text-white rounded-xl"
-                        onClick={() => setStep("additionals")}
-                    >
-                        Continue
-                    </button>
                 </div>
             )}
 
@@ -1667,57 +1256,7 @@ export default function RoomCalculator({ setMode}) {
                     </button>
                 </div>
             )}
-
-            {step === "roomCost" && (
-                <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-                    <h1 className="text-3xl font-bold">
-                        Cost per sq ft
-                    </h1>
-
-                    <input
-                        type="number"
-                        placeholder="$ / sqft"
-                        className="border p-4 w-full text-lg rounded-lg"
-                        onChange={(e) =>
-                            setRoomCost(parseFloat(e.target.value) || 0)
-                        }
-                    />
-
-                    <button
-                        className="w-full py-4 bg-blue-600 text-white rounded-xl"
-                        onClick={calculateRoomTotal}
-                    >
-                        Calculate
-                    </button>
-                </div>
-            )}
-
-            {step === "roomResult" && (
-                <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
-                    <h2 className="text-2xl font-semibold">
-                        Room Total
-                    </h2>
-                    {(numberOfBoxes ?? 0) > 1 && (
-                        <p>
-                            Number of Cartson: {numberOfBoxes} Cartons
-                        </p>
-                    )}
-
-                    <p className="text-5xl font-bold text-green-600">
-                        {roomTotal?.toLocaleString("en-CA", {
-                            style: "currency",
-                            currency: "CAD"
-                        })}
-                    </p>
-
-                    <button
-                        className="w-full py-4 bg-blue-600 text-white rounded-xl"
-                        onClick={resetRoom}
-                    >
-                        Main Menu
-                    </button>
-                </div>
-            )}
+            
         </>
     )
 }
