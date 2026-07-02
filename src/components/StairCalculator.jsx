@@ -1,6 +1,11 @@
 import React, { useState } from "react";
+import ScannerModal from "../ScannerModal";
 
 export default function StairCalculator({ setMode }) {
+
+    
+    const [scannerOpen, setScannerOpen] = useState(false);
+    const [scannedItem, setScannedItem] = useState(null);
     
     const PIECE_TYPES = {
         box: { w:3, h: 1.75 },
@@ -316,6 +321,30 @@ export default function StairCalculator({ setMode }) {
 
     return (
         <>
+            <button
+                onClick={resetStairs}
+                className="fixed w-40 h-14 top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-600 font-semibold transition"
+            >
+                Main Menu
+            </button>
+        
+            <button
+                className="fixed w-40 h-14 top-20 right-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg shadow-lg font-semibold transition"
+                onClick={() => setScannerOpen(true)}
+            >
+                Scan Product
+            </button>
+        
+            {scannerOpen && (
+                <ScannerModal
+                    onClose={() => setScannerOpen(false)}
+                    onSelect={(item) => {
+                        setScannedItem(item);
+                        setScannerOpen(false)
+                    }}
+                />
+            )}
+
             {step === "StairCalc" && (
                 <div className="bg-white rounded-2xl shadow-xl p-10 text-center space-y-6">
                     <h1 className="text-3xl font-bold text-center">
