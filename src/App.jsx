@@ -44,6 +44,18 @@ export default function App() {
 
   const [result, setResult] = useState(null);
 
+  const [quote, setQuote] = useState({
+    floorType: "",
+    rooms: [],
+    boxsqft: 0,
+    roomCost: 0,
+    roomInstall: false,
+    roomRemoval: false,
+    globalRemovalType: "",
+    extras: [],
+    totals: {}
+  })
+
 
 
   function resetApp() {
@@ -137,7 +149,10 @@ export default function App() {
       )}
 
       {mode === "vinylClickRoom" && (
-        <VinylClickRoom setMode={setMode} />
+        <VinylClickRoom 
+        quote={quote}
+        setQuote={setQuote}
+        setMode={setMode} />
       )}
 
       {mode === "vinylGlueRoom" && (

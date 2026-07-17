@@ -4,25 +4,26 @@ import { REMOVAL_COSTS } from "../Data/removalCosts";
 import { FLOORING } from "../Data/InstallCosts";
 import App from "../../App";
 
-export default function VinylClickRoom({ setMode }) {
+export default function VinylClickRoom({ quote, setQuote, setMode, setPage }) {
     const WASTE_FACTOR = 1.05
-
-    //Vinyl Click Install Costs
-    const minInstall = 375
-    const installRate = 2.25
+    
+    const {
+        rooms,
+        boxsqft,
+        numberOfBoxes,
+        roomCost,
+        roomInstall,
+        setRoomRemoval,
+        roomTotal,
+        globalRemovalType,
+        extras,
+        totals,
+    } = quote;
 
     const [step, setStep] = useState("roomsInput");
-    const [rooms, setRooms] = useState([]);
+
+
     const [roomInput, setRoomInput] = useState({ width: "", length: "", removalType: ""});
-    const [roomCost, setRoomCost] = useState(null)
-    const [roomTotal, setRoomTotal] = useState(null)
-    const [roomInstall, setRoomInstall] = useState(false)
-    const [roomRemoval, setRoomRemoval] = useState(false)
-
-    const [boxsqft, setBoxsqft] = useState(null)
-    const [numberOfBoxes, setNumberOfBoxes] = useState(null)
-
-    const [globalRemovalType, setGlobalRemovalType] = useState("")
 
     const [scannerOpen, setScannerOpen] = useState(false);
     const [scannedItem, setScannedItem] = useState(null);
@@ -35,19 +36,16 @@ export default function VinylClickRoom({ setMode }) {
 
         const perimeter = getRoomPerimeter(room);
 
-        console.log("Room Added:", {
-            width: room.width,
-            length: room.length,
-            perimeter: perimeter
-        });
-
         const newRoom = {
             ...room,
             removalType: "",
             perimeter: perimeter
         };
 
-        setRooms(prev => [...prev, newRoom]);
+        setQuote(prev => ({
+            ...prev,
+            rooms: [...prev.rooms, newRoom]
+        }));
     }
 
     function getRoomPerimeter(room) {
@@ -75,10 +73,16 @@ export default function VinylClickRoom({ setMode }) {
 
         if (boxsqft > 0) {
             totalArea = Math.ceil(roomsArea / boxsqft) * boxsqft
-            setNumberOfBoxes(totalArea / boxsqft)
+            setQuote(prev => ({
+                ...prev,
+                numberOfBoxes: (totalArea / boxsqft)
+            }))
         } else {
             totalArea = roomsArea;
-            setNumberOfBoxes(0);
+            setQuote(prev => ({
+                ...prev,
+                numberOfBoxes: (0)
+            }))
         }
 
         return(totalArea)
@@ -96,7 +100,10 @@ export default function VinylClickRoom({ setMode }) {
         console.log("Product Cost:", productCost)
         console.log("Removal Cost:", removalCost)
         console.log("Install Cost:", installCost)
-        setRoomTotal(total);
+        setQuote(prev => ({
+            ...prev,
+            roomTotal: (total)
+        }));
         setStep("roomResult")
     }
 
@@ -110,7 +117,7 @@ export default function VinylClickRoom({ setMode }) {
         
         const floor = FLOORING[selectedFloor];
 
-        if (!floor) return MACRO_05;
+        if (!floor) return 0;
 
         min = floor.minInstall || 0;
 
@@ -161,23 +168,21 @@ export default function VinylClickRoom({ setMode }) {
     
     function reset() {
         setStep("roomsInput")
-        setRooms([]);
         setRoomInput({ width: 0, length: 0});
-        setRoomCost(null)
-        setRoomTotal(null)
-        setBoxsqft(null)
-        setNumberOfBoxes(null)
-        setGlobalRemovalType("")
+    }
+
+    function roomCheck(){
+        console.log(quote)
     }
 
 
     return (
         <>
             <button
-                onClick={() => setMode("menu")}
-                className="fixed w-40 h-14 top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-600 font-semibold transition"
+                onClick={() => setPage("floorSelection")}
+                className="fixed w-40 h-14 top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 font-semibold transition"
             >
-                Main Menu
+                Flooring Selection
             </button>
 
             <button
@@ -185,6 +190,13 @@ export default function VinylClickRoom({ setMode }) {
                 onClick={() => setScannerOpen(true)}
             >
                 Scan Product
+            </button>
+
+            <button
+                className="fixed w-40 h-14 top-36 right-4 bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-lg font-semibold transition"
+                onClick={(roomCheck)}
+            >
+                Room Check
             </button>
             
             {scannerOpen && (
@@ -302,7 +314,10 @@ export default function VinylClickRoom({ setMode }) {
                         placeholder="sqft/box"
                         className="border p-4 w-full text-lg rounded-lg"
                         onChange={(e) =>
-                            setBoxsqft(parseFloat(e.target.value) || 0)
+                            setQuote(prev => ({
+                                ...prev,
+                                boxsqft: (parseFloat(e.target.value) || 0)
+                            }))
                         }
                     />
 
@@ -310,7 +325,10 @@ export default function VinylClickRoom({ setMode }) {
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
                             onClick={() => {
-                                setRoomInstall(false)
+                                setQuote(prev => ({
+                                    ...prev,
+                                    roomInstall: false
+                                }))
                                 setStep("roomCost")
                             }}
                         >
@@ -320,7 +338,10 @@ export default function VinylClickRoom({ setMode }) {
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
                             onClick={() => {
-                                setRoomInstall(true)
+                                setQuote(prev => ({
+                                    ...prev,
+                                    roomInstall: true
+                                }))
                                 setStep("roomRemoval")
                             }}
                         >
@@ -340,7 +361,10 @@ export default function VinylClickRoom({ setMode }) {
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
                             onClick={() => {
-                                setRoomRemoval(true)
+                                setQuote(prev => ({
+                                    ...prev,
+                                    roomRemoval: true
+                                }))
                                 setStep("removalDetails")
                             }}
                         >
@@ -350,7 +374,10 @@ export default function VinylClickRoom({ setMode }) {
                         <button
                             className="py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
                             onClick={() => {
-                                setRoomRemoval(false)
+                                setQuote(prev => ({
+                                    ...prev,
+                                    roomRemoval: false
+                                }))
                                 setStep("roomCost")
                             }}
                         >
@@ -371,7 +398,12 @@ export default function VinylClickRoom({ setMode }) {
 
                         <select
                             value={globalRemovalType}
-                            onChange={(e) => setGlobalRemovalType(e.target.value)}
+                            onChange={(e) => 
+                                setQuote(prev => ({
+                                    ...prev,
+                                    globalRemovalType: (e.target.value)
+                                }))
+                            }
                             className="border p-2 rounded-lg w-full"
                         >
                             <option value="">Select Type</option>
@@ -399,9 +431,18 @@ export default function VinylClickRoom({ setMode }) {
                                     value={globalRemovalType || room.removalType}
                                     disabled={!!globalRemovalType}
                                     onChange={(e) => {
-                                        const updatedRooms = [...rooms];
-                                        updatedRooms[index].removalType = e.target.value;
-                                        setRooms(updatedRooms);
+                                        setQuote(prev => {
+                                            const updatedRooms = [...prev.rooms];
+                                            updatedRooms[index] = {
+                                                ...updatedRooms[index],
+                                                removalType: e.target.value
+                                            };
+
+                                            return {
+                                                ...prev,
+                                                rooms: updatedRooms
+                                            };
+                                        });
                                     }}
                                  >
                                     <option value="">Select Type</option>
@@ -436,7 +477,10 @@ export default function VinylClickRoom({ setMode }) {
                         placeholder="$ / sqft"
                         className="border p-4 w-full text-lg rounded-lg"
                         onChange={(e) =>
-                            setRoomCost(parseFloat(e.target.value) || 0)
+                            setQuote(prev => ({
+                                ...prev,
+                                roomCost: (parseFloat(e.target.value) || 0)
+                            }))
                         }
                     />
 
